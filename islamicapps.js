@@ -531,7 +531,6 @@ const dataAsmaulHusnaLengkap = [
             }
         }
     }
-// ================= DATA & FUNGSI KITAB HADITS =================
 const daftarKitabHadits = [
     { id: 'bukhari', arab: 'صحيح البخاري', nama: 'Shahih Bukhari', tokoh: 'Imam Bukhari' },
     { id: 'muslim', arab: 'صحيح مسلم', nama: 'Shahih Muslim', tokoh: 'Imam Muslim' },
@@ -539,7 +538,7 @@ const daftarKitabHadits = [
     { id: 'abudawud', arab: 'سنن أبي داود', nama: 'Sunan Abu Dawud', tokoh: 'Imam Abu Daud' },
     { id: 'nasai', arab: 'سنن النسائي', nama: 'Sunan Nasa\'i', tokoh: 'Imam Nasa\'i' },
     { id: 'ibnumajah', arab: 'سنن ابن ماجه', nama: 'Sunan Ibnu Majah', tokoh: 'Imam Ibnu Majah' },
-    { id: 'darimi', arab: 'سنن الدارمي', nama: 'Sunan Darimi', tokoh: 'Imam Darimi' },
+    { id: 'darimi', arab: 'سنن الدارmi', nama: 'Sunan Darimi', tokoh: 'Imam Darimi' },
     { id: 'ahmad', arab: 'مسند أحمد', nama: 'Musnad Ahmad', tokoh: 'Imam Ahmad' },
     { id: 'malik', arab: 'موطأ مالك', nama: 'Muwatha\' Malik', tokoh: 'Imam Malik' },
     { id: 'daruquthni', arab: 'سنن الدارقطني', nama: 'Sunan Daruquthni', tokoh: 'Imam Daruquthni' },
@@ -547,48 +546,35 @@ const daftarKitabHadits = [
 ];
 
 function bukaHadits() {
-    // Sembunyikan halaman lain
+    // Sembunyikan semua halaman
     let pages = document.getElementsByClassName('page-view');
-    for(let i=0; i<pages.length; i++) {
-        pages[i].style.display = 'none';
-    }
+    for(let i=0; i<pages.length; i++) { pages[i].style.display = 'none'; }
+    
+    // Tampilkan halaman hadits
     document.getElementById('view-hadits').style.display = 'block';
 
-    // Render HTML dengan class persis seperti Surah
     let html = '';
     daftarKitabHadits.forEach((kitab, index) => {
         html += `
-        <div class='list-item list-kitab' onclick='bukaDetailKitab("${kitab.id}", "${kitab.nama}")'>
-            <div style='display:flex; align-items:center; flex: 1;'>
+        <div class='list-item' onclick='alert("Konten ${kitab.nama} segera hadir")'>
+            <div style='display:flex; align-items:center;'>
                 <div class='nomor-arab'>${index + 1}</div>
-                <div>
-                    <div style='font-weight: bold; font-size: 16px; color: var(--text-dark); margin-bottom: 3px;'>${kitab.nama}</div>
-                    <div style='font-size: 12px; color: var(--text-gray);'><i class='fa-solid fa-pen-nib'></i> ${kitab.tokoh}</div>
+                <div style='margin-left:10px;'>
+                    <div style='font-weight:bold;'>${kitab.nama}</div>
+                    <div style='font-size:11px; color:var(--text-gray);'>${kitab.tokoh}</div>
                 </div>
             </div>
-            <div class='teks-arab' style='margin-bottom:0; padding-top:0; font-size: 24px !important;'>${kitab.arab}</div>
+            <div class='teks-arab' style='font-size:20px!important; margin:0;'>${kitab.arab}</div>
         </div>`;
     });
-    
     document.getElementById('hadits-content').innerHTML = html;
-    window.scrollTo(0, 0);
 }
 
 function filterPencarianHadits() {
     let input = document.getElementById('searchInputHadits').value.toLowerCase();
-    let container = document.getElementById('hadits-content');
-    let items = container.getElementsByClassName('list-kitab');
-    
+    let items = document.getElementsByClassName('list-item');
     for (let i = 0; i < items.length; i++) {
-        let textContext = items[i].innerText.toLowerCase();
-        if (textContext.includes(input)) {
-            items[i].style.display = "flex";
-        } else {
-            items[i].style.display = "none";
-        }
+        let txt = items[i].innerText.toLowerCase();
+        items[i].style.display = txt.includes(input) ? "flex" : "none";
     }
-}
-
-function bukaDetailKitab(idKitab, namaKitab) {
-    alert("Insya Allah, isi dari Kitab " + namaKitab + " akan segera tersedia.");
 }
