@@ -1,4 +1,3 @@
-<script type='text/javascript'>
 //<![CDATA[
     let KOTA = "Jakarta"; 
     let NEGARA = "Indonesia";
@@ -535,4 +534,3 @@ const dataAsmaulHusnaLengkap = [
     }
 
 //]]>
-</script>
