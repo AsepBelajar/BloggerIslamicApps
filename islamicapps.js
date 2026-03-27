@@ -412,7 +412,7 @@
             html += `<div class='content-box ${centered ? 'centered-arab' : ''}'><div class='content-title'>${item.judul}</div><div class='teks-arab'>${item.arab.replace(/\n/g, '<br/>')}</div><div class='teks-latin'>${item.latin.replace(/\n/g, '<br/>')}</div><div class='teks-arti'>${item.arti.replace(/\n/g, '<br/>')}</div></div>`; 
         });
         document.getElementById('materi-content').innerHTML = html;
-        isCenteredContent = centered;
+        isCenteredContent = justify;
         terapkanPengaturan();
     }
 
