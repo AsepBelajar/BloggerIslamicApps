@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Alat Enkripsi Link Blogger AsepBelajar</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f7f6; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        input, textarea, button { width: 100%; box-sizing: border-box; margin-bottom: 15px; }
+        input { padding: 10px; font-size: 16px; }
+        button { padding: 12px; background: #28a745; color: white; border: none; font-size: 16px; cursor: pointer; border-radius: 4px; font-weight: bold;}
+        button:hover { background: #218838; }
+        textarea { height: 200px; padding: 10px; font-family: monospace; font-size: 14px; background: #eee; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🔒 Alat Enkripsi Link Blogger</h2>
+    <p>Masukkan link CDN/GitHub Anda di bawah ini:</p>
+    
+    <input type="text" id="linkInput" placeholder="Contoh: https://cdn.jsdelivr.net/gh/AsepBelajar/.../app.js">
+    
+    <button onclick="buatEnkripsi()">Buat Kode Blogger!</button>
+    
+    <p>Hasil Kode (Copy dan Paste di atas &lt;/body&gt; pada Blogger):</p>
+    <textarea id="hasilOutput" readonly></textarea>
+</div>
+
+<script>
+function buatEnkripsi() {
+    var link = document.getElementById("linkInput").value;
+    if(!link) { alert("Masukkan link dulu!"); return; }
+    
+    var arrayAngka = [];
+    for (var i = 0; i < link.length; i++) {
+        arrayAngka.push(link.charCodeAt(i));
+    }
+    
+    var hasil = "<script type='text/javascript'>\n" +
+                "//<![CDATA[\n" +
+                "(function(){\n" +
+                "    var sandi = [" + arrayAngka.join(', ') + "];\n" +
+                "    var linkAsli = '';\n" +
+                "    for(var i=0; i<sandi.length; i++){\n" +
+                "        linkAsli += String.fromCharCode(sandi[i]);\n" +
+                "    }\n" +
+                "    var s = document.createElement('script');\n" +
+                "    s.type = 'text/javascript';\n" +
+                "    s.src = linkAsli;\n" +
+                "    document.body.appendChild(s);\n" +
+                "})();\n" +
+                "//]]>\n" +
+                "<\/script>";
+                
+    document.getElementById("hasilOutput").value = hasil;
+}
+</script>
+
+</body>
+</html>
