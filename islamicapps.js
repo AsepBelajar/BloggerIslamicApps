@@ -534,107 +534,21 @@ const dataAsmaulHusnaLengkap = [
 
 
 
-    // ================= FUNGSI HADITS API (PERBAIKAN) =================
-    
-    var apiCacheHadits = {}; // Cache sederhana agar tidak load ulang
-    var currentKitabHadits = 'bukhari';
-    var currentDataHadits = [];
-
-    // Fungsi utama dipanggil dari menu
-    function bukaHadits() {
-        bukaHalaman('view-hadits');
-        if (currentDataHadits.length === 0) {
-            muatHaditsDariAPI('bukhari');
-        }
-    }
-
-    // Fungsi ganti tab kitab
-    function gantiKitabHadits(kitab) {
-        // Reset style tab
-        var tabs = document.querySelectorAll('#tab-hadits-container .tab-btn');
-        tabs.forEach(function(btn) { btn.classList.remove('active'); });
+     <!-- ================= VIEW HADITS (API & LIST KITAB) ================= -->
+    <div class='page-view' id='view-hadits'>
+        <div class='page-header'>
+            <button class='btn-back' onclick='kembali()'><i class='fa-solid fa-arrow-left'/></button>
+            <div class='page-title' id='judul-hadits'>Koleksi Hadits</div>
+            <button class='btn-circle' onclick='toggleDarkMode()' style='position:absolute; right:45px;'><i class='fa-solid fa-moon'/></button>
+            <button class='btn-circle' onclick='bukaPengaturan()' style='position:absolute; right:0;'><i class='fa-solid fa-font'/></button>
+        </div>
         
-        var activeBtn = document.getElementById('tab-' + kitab + '-api');
-        if(activeBtn) activeBtn.classList.add('active');
-
-        muatHaditsDariAPI(kitab);
-    }
-
-    // Fungsi Fetch ke API
-    async function muatHaditsDariAPI(kitab) {
-        var container = document.getElementById('hadits-list-content');
-        container.innerHTML = '<div class="loader"/><center><i>Memuat Hadits ' + kitab + '...</i></center>';
-        currentKitabHadits = kitab;
+        <div class='search-container' id='search-hadits-container' style='display:none;'>
+            <div class='search-box'>
+                <i class='fa-solid fa-magnifying-glass'/>
+                <input id='searchInputHadits' onkeyup='cariHadits()' placeholder='Cari hadits...' type='text'/>
+            </div>
+        </div>
         
-        // Cek Cache dulu
-        if (apiCacheHadits[kitab]) {
-            tampilkanListHadits(apiCacheHadits[kitab]);
-            return;
-        }
-
-        // Ambil data (contoh: ambil range 1-50 agar ringan, atau sesuai kebutuhan)
-        // API Sutanlab: https://api.hadith.sutanlab.id/books/{kitab}?range=1-50
-        var url = 'https://api.hadith.sutanlab.id/books/' + kitab + '?range=1-50';
-
-        try {
-            var response = await fetch(url);
-            var result = await response.json();
-            
-            if (result.code === 200 && result.data) {
-                apiCacheHadits[kitab] = result.data; // Simpan ke cache
-                tampilkanListHadits(result.data);
-            } else {
-                container.innerHTML = '<div class="content-box">Gagal memuat data atau data kosong.</div>';
-            }
-        } catch (error) {
-            console.error(error);
-            container.innerHTML = '<div class="content-box">Terjadi kesalahan jaringan.</div>';
-        }
-    }
-
-    // Render tampilan list
-    function tampilkanListHadits(data) {
-        currentDataHadits = data; // simpan data saat ini untuk pencarian/detail
-        var html = '';
-        
-        for (var i = 0; i < data.length; i++) {
-            var h = data[i];
-            // Potong teks arab jika terlalu panjang untuk preview
-            var previewArab = h.arab.length > 80 ? h.arab.substring(0, 80) + '...' : h.arab;
-            
-            html += '<div class="list-item" onclick="bukaDetailHaditsApi(' + i + ')">' +
-                    '<div style="width:100%">' +
-                        '<div class="teks-arab" style="font-size:18px; margin-bottom:5px; line-height:1.5; white-space:nowrap; overflow:hidden;">' + previewArab + '</div>' +
-                        '<small style="color:var(--blue-text)">Hadits No. ' + h.number + '</small>' +
-                    '</div>' +
-                    '<i class="fa-solid fa-chevron-left" style="transform:rotate(180deg); color:var(--text-gray); flex-shrink:0; margin-left:10px;"></i>' +
-                    '</div>';
-        }
-        
-        document.getElementById('hadits-list-content').innerHTML = html;
-    }
-
-    // Buka detail (menggunakan view-materi yang sudah ada agar konsisten)
-    function bukaDetailHaditsApi(index) {
-        var h = currentDataHadits[index];
-        
-        // Format data agar bisa dibaca oleh fungsi renderMateri yang sudah ada
-        // Struktur: { arab: "...", arti: "..." } -> kita map 'id' ke 'arti'
-        var dataDetail = [{
-            arab: h.arab,
-            latin: '', // API ini tidak menyediakan latin latin spesifik per hadits
-            arti: h.id // 'id' adalah terjemahan bahasa indonesia di API ini
-        }];
-
-        // Panggil fungsi yang sudah ada di kode asli Anda
-        renderMateri("Hadits No. " + h.number, dataDetail);
-    }
-
-    // Fungsi Pencarian Sederhana
-    function cariHadits() {
-        var query = document.getElementById('searchInputHadits').value.toLowerCase();
-        var filtered = currentDataHadits.filter(function(item) {
-            return item.id.toLowerCase().indexOf(query) > -1 || item.arab.indexOf(query) > -1 || (item.number.toString() === query);
-        });
-        tampilkanListHadits(filtered);
-    }
+        <div id='hadits-container-utama' style='padding: 15px 0;'/>
+    </div>
