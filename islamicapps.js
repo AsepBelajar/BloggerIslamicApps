@@ -140,7 +140,6 @@
                     text-align: justify !important;
                     text-justify: inter-word !important;
                     text-align-last: right !important; /* Memaksa baris paling bawah rata kanan */
-                    direction: rtl; 
                     line-height: 2.8 !important; 
                     padding: 0 5px !important;
                 }
