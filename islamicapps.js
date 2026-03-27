@@ -97,7 +97,7 @@
         terapkanPengaturan();
     }
     
-    function terapkanPengaturan() {
+   function terapkanPengaturan() {
         // Atur body class untuk mode arab saja
         if (modeTampilan === 'arab') {
             document.body.classList.add('arab-only-mode');
@@ -113,9 +113,17 @@
             document.head.appendChild(dynamicStyle);
         }
         
+        // CSS Dasar (Berlaku di semua mode)
         let styleCSS = `
             .teks-arab { font-size: ${ukuranArab}px !important; }
             .teks-latin, .teks-arti { font-size: ${ukuranLatin}px !important; }
+            
+            /* PERBAIKAN PERMANEN: Judul konten (Hadits, Doa, Al-Qur'an, dll) WAJIB Rata Kiri (LTR) */
+            .content-title { 
+                direction: ltr !important; 
+                text-align: left !important; 
+                display: block !important;
+            }
         `;
         
         // Aturan Khusus saat "Mode Arab Saja" aktif
@@ -124,19 +132,22 @@
                 /* 1. Sembunyikan teks latin dan arti */
                 .teks-latin, .teks-arti { display: none !important; }
                 
-                /* 2. Format Teks Tersambung & Rata Kanan (Justify) */
+                /* 2. Format Teks Tersambung & Rata Kanan (Justify) untuk Semua Konten TERMASUK HADITS */
                 .arab-only-mode #quran-detail-content,
                 .arab-only-mode #dzikir-content,
-                .arab-only-mode #materi-content {
+                .arab-only-mode #materi-content,
+                .arab-only-mode #hadits-detail-content {
                     text-align: justify !important;
                     text-justify: inter-word !important;
+                    text-align-last: right !important; /* Memaksa baris paling bawah rata kanan */
                     direction: rtl !important; 
-                    line-height: 2.8 !important; /* PERBAIKAN: Spasi antar baris atas-bawah lebih renggang */
+                    line-height: 2.8 !important; 
                     padding: 0 5px !important;
                 }
 
                 /* Hilangkan box/margin pembungkus agar teks bisa mengalir (tersambung) */
                 .arab-only-mode #quran-detail-content > div,
+                .arab-only-mode #hadits-detail-content > div,
                 .arab-only-mode .content-box:not(.centered-arab) {
                     display: inline !important;
                     border: none !important;
@@ -148,10 +159,10 @@
 
                 .arab-only-mode .teks-arab:not(.centered-arab .teks-arab) {
                     display: inline !important;
-                    margin-left: 15px !important; /* PERBAIKAN: Jarak spasi horizontal pemisah antar ayat */
+                    margin-left: 15px !important; /* Jarak spasi antar ayat/hadits */
                 }
 
-                /* 3. Kembalikan Format Rata Tengah & Per Baris untuk Nadzhom, Burdah & Mahalul Qiyam */
+                /* 3. Kembalikan Format Rata Tengah & Per Baris untuk Nadzhom/Maulid */
                 .arab-only-mode .centered-arab {
                     display: block !important; 
                     text-align: center !important;
@@ -164,7 +175,7 @@
                     display: block !important;
                     text-align: center !important;
                     margin-bottom: 10px !important;
-                    margin-left: 0 !important; /* Reset margin agar tetap presisi di tengah */
+                    margin-left: 0 !important; 
                 }
             `;
         }
@@ -412,7 +423,7 @@
             html += `<div class='content-box ${centered ? 'centered-arab' : ''}'><div class='content-title'>${item.judul}</div><div class='teks-arab'>${item.arab.replace(/\n/g, '<br/>')}</div><div class='teks-latin'>${item.latin.replace(/\n/g, '<br/>')}</div><div class='teks-arti'>${item.arti.replace(/\n/g, '<br/>')}</div></div>`; 
         });
         document.getElementById('materi-content').innerHTML = html;
-        isCenteredContent = justified;
+        isCenteredContent = centered;
         terapkanPengaturan();
     }
 
