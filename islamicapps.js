@@ -1,4 +1,3 @@
-//<![CDATA[
     let KOTA = "Jakarta"; 
     let NEGARA = "Indonesia";
     
@@ -532,5 +531,3 @@ const dataAsmaulHusnaLengkap = [
             }
         }
     }
-
-//]]>
