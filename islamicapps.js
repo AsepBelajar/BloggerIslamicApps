@@ -534,21 +534,81 @@ const dataAsmaulHusnaLengkap = [
 
 
 
-     <!-- ================= VIEW HADITS (API & LIST KITAB) ================= -->
-    <div class='page-view' id='view-hadits'>
-        <div class='page-header'>
-            <button class='btn-back' onclick='kembali()'><i class='fa-solid fa-arrow-left'/></button>
-            <div class='page-title' id='judul-hadits'>Koleksi Hadits</div>
-            <button class='btn-circle' onclick='toggleDarkMode()' style='position:absolute; right:45px;'><i class='fa-solid fa-moon'/></button>
-            <button class='btn-circle' onclick='bukaPengaturan()' style='position:absolute; right:0;'><i class='fa-solid fa-font'/></button>
-        </div>
+ /* PERBAIKAN FITUR HADITS */
+function bukaHadits() {
+    bukaHalaman('view-hadits');
+    fetchDaftarKitabHadits();
+}
+
+async function fetchDaftarKitabHadits() {
+    const container = document.getElementById('daftar-hadits');
+    container.innerHTML = "<div class='loader'></div><center><i>Memuat Kitab Hadits...</i></center>";
+    try {
+        // Menggunakan API Hadits yang stabil
+        const response = await fetch('https://api.hadith.gading.dev/books');
+        const result = await response.json();
         
-        <div class='search-container' id='search-hadits-container' style='display:none;'>
-            <div class='search-box'>
-                <i class='fa-solid fa-magnifying-glass'/>
-                <input id='searchInputHadits' onkeyup='cariHadits()' placeholder='Cari hadits...' type='text'/>
-            </div>
-        </div>
+        let html = "";
+        result.data.forEach(kitab => {
+            html += `
+                <div class='list-item' onclick='bukaKitabHadits("${kitab.id}", "${kitab.name}", ${kitab.available})'>
+                    <div style='display:flex; align-items:center;'>
+                        <div class='nomor-arab' style='font-size:16px!important;'><i class="fa-solid fa-book"></i></div>
+                        <div>
+                            <div style='font-weight:bold; color:var(--text-dark);'>HR. ${kitab.name}</div>
+                            <div style='font-size:12px; color:var(--text-gray);'>Jumlah: ${kitab.available} Hadits</div>
+                        </div>
+                    </div>
+                    <i class='fa-solid fa-chevron-right' style='color:var(--border-color);'></i>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    } catch (error) {
+        container.innerHTML = "<center><i style='color:red;'>Gagal memuat daftar hadits. Periksa koneksi internet Anda.</i></center>";
+    }
+}
+
+async function bukaKitabHadits(idKitab, namaKitab, total) {
+    bukaHalaman('view-hadits-detail');
+    document.getElementById('judul-kitab-hadits').innerText = "HR. " + namaKitab;
+    document.getElementById('searchInputHadits').value = "";
+    
+    const container = document.getElementById('hadits-detail-content');
+    // Memuat 50 hadits pertama (dapat diubah rangenya di URL)
+    container.innerHTML = "<div class='loader'></div><center><i>Memuat Hadits... (Mengambil 50 Hadits Awal)</i></center>";
+    
+    try {
+        const response = await fetch(`https://api.hadith.gading.dev/books/${idKitab}?range=1-50`);
+        const result = await response.json();
         
-        <div id='hadits-container-utama' style='padding: 15px 0;'/>
-    </div>
+        let html = "";
+        result.data.hadiths.forEach(hadits => {
+            html += `
+                <div class='content-box hadits-item'>
+                    <div class='content-title' style='color: var(--blue-text);'>Hadits No. ${hadits.number}</div>
+                    <div class='teks-arab'>${hadits.arab}</div>
+                    <div class='teks-arti'>${hadits.id}</div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+    } catch (error) {
+        container.innerHTML = "<center><i style='color:red;'>Gagal memuat hadits. Periksa koneksi internet Anda.</i></center>";
+    }
+}
+
+function filterPencarianHadits() {
+    let input = document.getElementById('searchInputHadits').value.toLowerCase();
+    let items = document.getElementsByClassName('hadits-item');
+    
+    for (let i = 0; i < items.length; i++) {
+        let text = items[i].innerText.toLowerCase();
+        if (text.includes(input)) {
+            items[i].style.display = "";
+        } else {
+            items[i].style.display = "none";
+        }
+    }
+}
