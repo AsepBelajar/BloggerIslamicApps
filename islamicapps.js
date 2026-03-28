@@ -543,3 +543,221 @@ const dataAsmaulHusnaLengkap = [
     }
 
 
+
+/* =======================================================
+   1. INJEKSI CSS FIX (JUSTIFY ARAB PERMANEN & LAYOUT)
+========================================================= */
+const styleFix = document.createElement('style');
+styleFix.innerHTML = `
+    #hadits-detail-content .teks-arab { 
+        text-align: justify !important; 
+        text-align-last: right !important; 
+        direction: rtl !important; 
+        text-justify: inter-word !important;
+        display: block !important;
+        width: 100% !important;
+    }
+    #hadits-detail-content .teks-arti { text-align: justify !important; }
+    #hadits-detail-content .content-title { direction: ltr !important; text-align: left !important; display: block; }
+    
+    #daftar-hadits { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px 0; }
+    #daftar-hadits .list-item { margin-bottom: 0; transition: transform 0.2s; }
+    #daftar-hadits .list-item:active { transform: scale(0.96); }
+`;
+document.head.appendChild(styleFix);
+
+/* =======================================================
+   2. FIX TOMBOL HOME & TOMBOL KEMBALI
+========================================================= */
+function pasangTombolHome() {
+    const headers = document.querySelectorAll('.page-view:not(#view-dashboard) .page-header');
+    headers.forEach(header => {
+        if (!header.querySelector('.btn-home')) {
+            const backBtn = header.querySelector('.btn-back');
+            if (backBtn) {
+                const homeBtn = document.createElement('button');
+                homeBtn.className = 'btn-back btn-home';
+                homeBtn.setAttribute('onclick', 'bukaHalaman("view-dashboard")');
+                homeBtn.title = 'Kembali ke Beranda';
+                homeBtn.innerHTML = '<i class="fa-solid fa-house"></i>';
+                backBtn.insertAdjacentElement('afterend', homeBtn);
+            }
+        }
+    });
+    const backHadits = document.querySelector('#view-hadits > .page-header > .btn-back:not(.btn-home)');
+    if (backHadits) backHadits.setAttribute('onclick', 'bukaHalaman("view-dashboard")');
+}
+document.addEventListener("DOMContentLoaded", pasangTombolHome);
+setTimeout(pasangTombolHome, 500);
+
+/* =======================================================
+   3. VARIABEL GLOBAL UNTUK SISTEM LOAD MORE HADITS
+========================================================= */
+let stateKitabId = "";
+let stateTotalHadits = 0;
+let stateLoadedHadits = 0;
+let isFetchingHadits = false;
+const limitPerLoad = 50; // Jumlah yang dimuat tiap kali klik
+
+/* =======================================================
+   4. FUNGSI INTI HADITS & LOAD MORE API
+========================================================= */
+function bukaHadits() {
+    bukaHalaman('view-hadits');
+    fetchDaftarKitabHadits();
+}
+
+async function fetchDaftarKitabHadits() {
+    const container = document.getElementById('daftar-hadits');
+    container.style.display = 'block'; 
+    container.innerHTML = "<div class='loader'></div><center><i>Memuat Kitab Hadits...</i></center>";
+    
+    try {
+        const response = await fetch('https://api.hadith.gading.dev/books');
+        const result = await response.json();
+        
+        let html = "";
+        result.data.forEach(kitab => {
+            html += `
+                <div class='list-item' onclick='bukaKitabHadits("${kitab.id}", "${kitab.name}", ${kitab.available})' style='display:flex; flex-direction:column; align-items:center; text-align:center; padding: 15px 10px; gap: 8px;'>
+                    <div class='nomor-arab' style='font-size:22px!important; margin:0; width:50px; height:50px; display:flex; justify-content:center; align-items:center; background:var(--blue-light); border:none;'><i class="fa-solid fa-book"></i></div>
+                    <div style='direction: ltr; width:100%;'>
+                        <div style='font-weight:bold; color:var(--text-dark); font-size: 13px;'>${kitab.name}</div>
+                        <div style='font-size:11px; color:var(--text-gray); margin-top:3px;'>${kitab.available} Hadits</div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.style.display = 'grid';
+        container.innerHTML = html;
+    } catch (error) {
+        container.style.display = 'block';
+        container.innerHTML = "<center><i style='color:red;'>Gagal memuat daftar hadits. Periksa koneksi internet Anda.</i></center>";
+    }
+}
+
+async function bukaKitabHadits(idKitab, namaKitab, total) {
+    bukaHalaman('view-hadits-detail');
+    document.getElementById('judul-kitab-hadits').innerText = namaKitab;
+    
+    const searchInput = document.getElementById('searchInputHadits');
+    if (searchInput) searchInput.value = "";
+    
+    // Reset Data State
+    stateKitabId = idKitab;
+    stateTotalHadits = total;
+    stateLoadedHadits = 0;
+    
+    const container = document.getElementById('hadits-detail-content');
+    container.innerHTML = "<div class='loader'></div><center><i>Memuat Hadits...</i></center>";
+    
+    // Panggil batch pertama (1 sampai 50)
+    await panggilBatchHadits(1, limitPerLoad, true);
+}
+
+// Fungsi utama penarik data hadits secara bertahap
+async function panggilBatchHadits(start, end, isFirstLoad = false) {
+    if (isFetchingHadits) return;
+    isFetchingHadits = true;
+    
+    const container = document.getElementById('hadits-detail-content');
+    
+    // Pastikan batas akhir tidak melebihi total hadits di kitab tersebut
+    if (end > stateTotalHadits) end = stateTotalHadits;
+
+    // Tampilkan loading kecil saat memuat lebih banyak
+    if (!isFirstLoad) {
+        container.insertAdjacentHTML('beforeend', "<div id='loading-more' style='text-align:center; padding:10px;'><i class='fa-solid fa-spinner fa-spin' style='color:var(--blue-main); font-size:24px;'></i><br><small>Memuat data...</small></div>");
+    }
+    
+    try {
+        const response = await fetch(`https://api.hadith.gading.dev/books/${stateKitabId}?range=${start}-${end}`);
+        const result = await response.json();
+        
+        let html = "";
+        result.data.hadiths.forEach(hadits => {
+            html += `
+                <div class='content-box hadits-item'>
+                    <div class='content-title' style='color: var(--blue-text);'>Hadits No. ${hadits.number}</div>
+                    <div class='teks-arab'>${hadits.arab}</div>
+                    <div class='teks-arti'>${hadits.id}</div>
+                </div>
+            `;
+        });
+        
+        if (isFirstLoad) {
+            container.innerHTML = html;
+        } else {
+            // Hapus ikon loading kecil
+            const loader = document.getElementById('loading-more');
+            if (loader) loader.remove();
+            
+            // Masukkan data hadits tambahan ke bagian bawah
+            container.insertAdjacentHTML('beforeend', html);
+        }
+        
+        stateLoadedHadits = end;
+        
+        // Buat Tombol "Muat Lebih Banyak" jika masih ada sisa hadits
+        if (stateLoadedHadits < stateTotalHadits) {
+            const sisa = stateTotalHadits - stateLoadedHadits;
+            const btnHtml = `
+                <button id='btnLoadMoreHadits' onclick='muatSelanjutnya()' style='width:100%; padding:15px; margin-top:15px; background:var(--blue-main); color:white; border:none; border-radius:12px; font-weight:bold; cursor:pointer; font-size:15px; transition:0.3s;'>
+                    Muat Lebih Banyak <br><small style='font-weight:normal;'>(${sisa} hadits tersisa)</small>
+                </button>
+            `;
+            container.insertAdjacentHTML('beforeend', btnHtml);
+        }
+        
+    } catch (error) {
+        if (isFirstLoad) {
+            container.innerHTML = "<center><i style='color:red;'>Gagal memuat hadits. Periksa koneksi internet Anda.</i></center>";
+        } else {
+            alert("Gagal memuat kelanjutan hadits.");
+            const loader = document.getElementById('loading-more');
+            if (loader) loader.remove();
+        }
+    } finally {
+        isFetchingHadits = false;
+        // Jalankan ulang filter pencarian untuk jaga-jaga ada kata yang dicari saat load
+        window.filterPencarianHadits();
+    }
+}
+
+// Fungsi Pemicu Klik Tombol Load More
+window.muatSelanjutnya = function() {
+    const btn = document.getElementById('btnLoadMoreHadits');
+    if (btn) btn.remove(); // Hapus tombol sebelum data baru ditarik
+    
+    const start = stateLoadedHadits + 1;
+    const end = stateLoadedHadits + limitPerLoad;
+    panggilBatchHadits(start, end, false);
+};
+
+/* =======================================================
+   5. FIX PENCARIAN (Global Window Scope)
+========================================================= */
+window.filterPencarianHadits = function() {
+    let inputEl = document.getElementById('searchInputHadits');
+    if (!inputEl) return;
+    
+    let inputVal = inputEl.value.toLowerCase();
+    let items = document.querySelectorAll('#hadits-detail-content .hadits-item');
+    
+    items.forEach(item => {
+        let text = item.innerText.toLowerCase();
+        if (text.includes(inputVal)) {
+            item.style.display = "block";
+        } else {
+            item.style.display = "none";
+        }
+    });
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    let searchInput = document.getElementById('searchInputHadits');
+    if (searchInput) {
+        searchInput.addEventListener('keyup', window.filterPencarianHadits);
+    }
+});
