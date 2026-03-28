@@ -672,9 +672,8 @@ async function panggilBatchHadits(start, end, isFirstLoad = false) {
     }
     
     try {
-// Ganti activeKitabId dengan variabel asli di file JS Anda, misalnya stateKitabAktif
-const response = await fetch(`https://api.hadith.gading.dev/books/${stateKitabAktif}/${inputVal}`);
-                const result = await response.json();
+        const response = await fetch(`https://api.hadith.gading.dev/books/${stateKitabId}?range=${start}-${end}`);
+        const result = await response.json();
         
         let html = "";
         result.data.hadiths.forEach(hadits => {
@@ -739,26 +738,4 @@ window.muatSelanjutnya = function() {
 /* =======================================================
    5. FIX PENCARIAN (Global Window Scope)
 ========================================================= */
-window.filterPencarianHadits = function() {
-    let inputEl = document.getElementById('searchInputHadits');
-    if (!inputEl) return;
-    
-    let inputVal = inputEl.value.toLowerCase();
-    let items = document.querySelectorAll('#hadits-detail-content .hadits-item');
-    
-    items.forEach(item => {
-        let text = item.innerText.toLowerCase();
-        if (text.includes(inputVal)) {
-            item.style.display = "block";
-        } else {
-            item.style.display = "none";
-        }
-    });
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-    let searchInput = document.getElementById('searchInputHadits');
-    if (searchInput) {
-        searchInput.addEventListener('keyup', window.filterPencarianHadits);
-    }
-});
+5. FIX PENCARIAN
