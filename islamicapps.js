@@ -672,8 +672,9 @@ async function panggilBatchHadits(start, end, isFirstLoad = false) {
     }
     
     try {
-        const response = await fetch(`https://api.hadith.gading.dev/books/${stateKitabId}?range=${start}-${end}`);
-        const result = await response.json();
+// Ganti activeKitabId dengan variabel asli di file JS Anda, misalnya stateKitabAktif
+const response = await fetch(`https://api.hadith.gading.dev/books/${stateKitabAktif}/${inputVal}`);
+                const result = await response.json();
         
         let html = "";
         result.data.hadiths.forEach(hadits => {
