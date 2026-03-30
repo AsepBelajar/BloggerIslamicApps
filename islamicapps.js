@@ -185,6 +185,7 @@ function terapkanPengaturan() {
             .arab-only-mode #quran-detail-content,
             .arab-only-mode #dzikir-content,
             .arab-only-mode #materi-content {
+                direction: rtl !important; /* <--- INI OBATNYA: Memaksa ayat kembali dari Kanan ke Kiri */
                 text-align: justify !important;
                 text-justify: inter-word !important;
                 text-align-last: right !important;
@@ -210,18 +211,19 @@ function terapkanPengaturan() {
                 border-bottom: 2px dashed #eee !important;
                 padding: 20px 10px !important;
                 margin-bottom: 15px !important;
+                direction: ltr !important; /* Melindungi judul agar tidak ikut ke kanan */
             }
             .arab-only-mode .centered-arab .teks-arab {
                 display: block !important;
                 text-align: center !important;
                 margin-bottom: 10px !important;
                 margin-left: 0 !important; 
+                direction: rtl !important;
             }
         `;
     }
     dynamicStyle.innerHTML = styleCSS;
 }
-
 // ==========================================
 // 5. LOKASI & JADWAL SHALAT (WAKTU OTOMATIS)
 // ==========================================
