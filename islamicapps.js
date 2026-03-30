@@ -206,24 +206,20 @@ if (modeTampilan === 'arab') {
         }
         
         /* ============================================
-           4. NOMOR AYAT - Posisikan dengan benar
-           ============================================ */
-                  /* ============================================
-           4. AYAT MARKER - PERBAIKAN BENTUK LONJONG
+           4. AYAT MARKER - SOLUSI STABIL (Tanpa merusak Justify)
            ============================================ */
         .arab-only-mode .ayat-marker {
-            display: inline-flex !important; /* ⬅️ Diubah ke flex agar isi selalu tengah */
-            align-items: center !important;  /* ⬅️ Pusatkan vertikal isi angka */
-            justify-content: center !important; /* ⬅️ Pusatkan horizontal isi angka */
+            display: inline-block !important; /* WAJIB inline-block, jangan flex */
             unicode-bidi: isolate !important;
             direction: rtl !important;
             margin: 0 8px !important;
             vertical-align: middle !important;
-            line-height: 1 !important; /* ⬅️ RAHASIA: Diubah dari 0 jadi 1, agar tidak gepeng */
+            line-height: normal !important; /* ⬅️ RAHASIA: Normal mengembalikan bentuk bulat sempurna */
             position: relative !important;
-            top: 0.1em !important; /* ⬅️ Disesuaikan karena line-height berubah */
+            top: -0.15em !important; /* ⬅️ Fine-tuning: Turunkan sedikit agar mati di tengah huruf Arab */
         }
 
+        
         /* ============================================
            5. BISMILLAH - PAKSA BLOCK UNTUK CENTER 100%
            ============================================ */
