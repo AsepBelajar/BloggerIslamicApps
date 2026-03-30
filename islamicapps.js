@@ -164,45 +164,65 @@ function terapkanPengaturan() {
             /* Sembunyikan terjemahan dan latin */
             .teks-latin, .teks-arti { display: none !important; }
             
-            /* 1. MENGAKTIFKAN KEMBALI JUSTIFY (Rata Kiri-Kanan) */
+            /* ============================================
+               1. PARENT CONTAINER - Satu kali RTL di sini saja
+               ============================================ */
             .arab-only-mode #quran-detail-content,
             .arab-only-mode #dzikir-content,
             .arab-only-mode #materi-content {
                 direction: rtl !important;
-                text-align: justify !important; /* Dinyalakan kembali */
-                text-align-last: right !important; /* Baris penutup tetap di kanan */
+                text-align: justify !important;
+                text-align-last: right !important;
                 display: block !important;
                 line-height: 2.5 !important;
                 padding: 15px !important;
+                /* HAPUS whitespace antar child elements */
+                font-size: 0 !important; /* Trik hapus spasi inline */
             }
             
-            /* 2. Jadikan box per-ayat menyatu seperti paragraf buku */
+            /* ============================================
+               2. CONTENT-BOX - Gunakan inline-block BUKAN inline
+               ============================================ */
             .arab-only-mode .content-box {
-                display: inline !important;
+                display: inline-block !important;  /* ✅ inline-block, bukan inline */
                 border: none !important;
                 background: transparent !important;
                 padding: 0 !important;
                 margin: 0 !important;
                 box-shadow: none !important;
+                vertical-align: top !important;    /* ✅ Prevent baseline shift */
+                /* Kembalikan font-size dari parent yang di-set 0 */
+                font-size: ${ukuranArab}px !important;
             }
             
-            /* 3. Teks Arab mengalir natural */
+            /* ============================================
+               3. TEKS ARAB - JANGAN set direction lagi!
+               ============================================ */
             .arab-only-mode .content-box .teks-arab {
-                display: inline !important;
-                direction: rtl !important;
+                display: block !important;  /* ✅ block untuk justify bekerja */
+                direction: inherit !important;  /* ✅ Warisi dari parent, JANGAN set rtl lagi */
                 letter-spacing: normal !important;
                 word-spacing: normal !important;
+                text-align: justify !important;
+                text-align-last: right !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
             
-            /* 4. Penanda Nomor Ayat (Diisolasi agar angka tidak membalik teks) */
+            /* ============================================
+               4. AYAT MARKER - Isolate dengan benar
+               ============================================ */
             .arab-only-mode .ayat-marker {
-                display: inline-block !important; 
-                unicode-bidi: isolate !important; 
+                display: inline-block !important;
+                unicode-bidi: isolate !important;
                 direction: rtl !important;
-                margin: 0 8px !important;
+                margin: 0 5px !important;
+                vertical-align: middle !important;
             }
 
-            /* 5. Khusus Bismillah di awal surat agar tetap manis di tengah */
+            /* ============================================
+               5. BISMILLAH - Tetap di tengah
+               ============================================ */
             .arab-only-mode #quran-detail-content > .content-box:first-child .teks-arab,
             .arab-only-mode #quran-detail-content > .teks-arab:first-child {
                 display: block !important;
@@ -210,11 +230,19 @@ function terapkanPengaturan() {
                 margin-bottom: 25px !important;
                 width: 100% !important;
             }
+
+            /* ============================================
+               6. BONUS: Perbaikan untuk kontainer terlalu sempit
+               ============================================ */
+            .arab-only-mode #quran-detail-content {
+                max-width: 100% !important;
+                overflow-wrap: break-word !important;
+                word-break: normal !important;
+            }
         `;
     }
     dynamicStyle.innerHTML = styleCSS;
 }
-
 
 
 // ==========================================
