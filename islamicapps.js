@@ -138,7 +138,8 @@ function setModeTampilan(mode) {
     terapkanPengaturan();
 }
 
- function terapkanPengaturan() {
+ 
+function terapkanPengaturan() {
     if (modeTampilan === 'arab') {
         document.body.classList.add('arab-only-mode');
     } else {
@@ -163,12 +164,13 @@ function setModeTampilan(mode) {
             /* Sembunyikan terjemahan dan latin */
             .teks-latin, .teks-arti { display: none !important; }
             
-            /* 1. WADAH MUSHAF: Rata Kanan Murni (Solusi agar Waqaf tidak menumpuk) */
+            /* 1. MENGAKTIFKAN KEMBALI JUSTIFY (Rata Kiri-Kanan) */
             .arab-only-mode #quran-detail-content,
             .arab-only-mode #dzikir-content,
             .arab-only-mode #materi-content {
                 direction: rtl !important;
-                text-align: justify !important; /* Jangan gunakan justify di sini */
+                text-align: justify !important; /* Dinyalakan kembali */
+                text-align-last: right !important; /* Baris penutup tetap di kanan */
                 display: block !important;
                 line-height: 2.5 !important;
                 padding: 15px !important;
@@ -184,7 +186,7 @@ function setModeTampilan(mode) {
                 box-shadow: none !important;
             }
             
-            /* 3. Teks Arab mengalir natural, tanpa tarikan spasi paksa */
+            /* 3. Teks Arab mengalir natural */
             .arab-only-mode .content-box .teks-arab {
                 display: inline !important;
                 direction: rtl !important;
@@ -212,6 +214,7 @@ function setModeTampilan(mode) {
     }
     dynamicStyle.innerHTML = styleCSS;
 }
+
 
 
 // ==========================================
