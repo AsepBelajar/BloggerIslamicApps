@@ -208,18 +208,20 @@ if (modeTampilan === 'arab') {
         /* ============================================
            4. NOMOR AYAT - Posisikan dengan benar
            ============================================ */
-             /* ============================================
-           4. AYAT MARKER - RAHASIA CENTER VERTIKAL
+                  /* ============================================
+           4. AYAT MARKER - PERBAIKAN BENTUK LONJONG
            ============================================ */
         .arab-only-mode .ayat-marker {
-            display: inline-block !important; /* Lebih presisi dari inline */
+            display: inline-flex !important; /* ⬅️ Diubah ke flex agar isi selalu tengah */
+            align-items: center !important;  /* ⬅️ Pusatkan vertikal isi angka */
+            justify-content: center !important; /* ⬅️ Pusatkan horizontal isi angka */
             unicode-bidi: isolate !important;
             direction: rtl !important;
             margin: 0 8px !important;
             vertical-align: middle !important;
-            line-height: 0 !important; /* ⬅️ RAHASIA UTAMA: Mencegah nomor terseret garis tinggi Arab */
+            line-height: 1 !important; /* ⬅️ RAHASIA: Diubah dari 0 jadi 1, agar tidak gepeng */
             position: relative !important;
-            top: -0.1em !important; /* ⬅️ Fine-tuning: Naikkan sedikit agar tepat di tengah huruf */
+            top: 0.1em !important; /* ⬅️ Disesuaikan karena line-height berubah */
         }
 
         /* ============================================
