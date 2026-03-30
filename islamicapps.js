@@ -184,13 +184,13 @@ if (modeTampilan === 'arab') {
            2. CONTENT-BOX - Ubah ke INLINE (bukan inline-block)
            ============================================ */
         .arab-only-mode .content-box {
-            display: inline !important;  /* ✅ Perubahan kunci */
-            border: none !important;
+            display: inline !important; 
+            border: 0px none transparent !important; /* ⬅️ Paksa hilangkan border */
+            outline: none !important;                /* ⬅️ Hilangkan outline */
             background: transparent !important;
             padding: 0 !important;
             margin: 0 !important;
             box-shadow: none !important;
-            /* Kembalikan font-size */
             font-size: ${ukuranArab}px !important;
             word-spacing: normal !important;
         }
