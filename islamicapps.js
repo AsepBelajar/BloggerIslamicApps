@@ -22,14 +22,14 @@ let dataYasin = [];
 let dataAsmaulHusna = [];
 
 // ==========================================
-// 2. INISIALISASI & TARIK DATA JSON (ANTI-CACHE)
+// 2. INISIALISASI OTOMATIS SAAT WEB DIBUKA
 // ==========================================
-// Langsung eksekusi pemanggilan agar tidak stuck "Memuat..."
 muatDataJSON();
+deteksiLokasi(); // Meminta izin lokasi secara otomatis saat web dibuka
 
 function muatDataJSON() {
-    // Menggunakan GitHack agar tidak diblokir oleh browser
-    const linkGithubJSON = "https://raw.githack.com/AsepBelajar/BloggerIslamicApps/main/databaseaplikasiislam.json";
+    // KHUSUS JSON, kita langsung tembak server GitHub asli karena lebih cepat & stabil untuk fetch()
+    const linkGithubJSON = "https://raw.githubusercontent.com/AsepBelajar/BloggerIslamicApps/main/databaseaplikasiislam.json";
     const urlAntiCache = linkGithubJSON + "?t=" + new Date().getTime();
 
     fetch(urlAntiCache)
@@ -38,7 +38,6 @@ function muatDataJSON() {
             return response.json();
         })
         .then(data => {
-            // Memasukkan data dari GitHub ke dalam memori aplikasi
             if(data.dzikirPagi) dataDzikirPagi = data.dzikirPagi;
             if(data.dzikirPetang) dataDzikirPetang = data.dzikirPetang;
             if(data.doaHarian) dataDoaHarian = data.doaHarian;
@@ -49,7 +48,7 @@ function muatDataJSON() {
             if(data.tahlil) dataTahlil = data.tahlil;
             if(data.yasin) dataYasin = data.yasin;
             if(data.nadhomAsmaulHusna) dataAsmaulHusna = data.nadhomAsmaulHusna;
-            console.log("Semua data berhasil ditarik dari GitHub!");
+            console.log("Semua data JSON berhasil ditarik dari server asli GitHub!");
         })
         .catch(error => console.error("Error load JSON:", error));
 }
@@ -68,7 +67,6 @@ function bukaHalaman(idHalaman, pushState = true) {
     window.scrollTo(0, 0);
     if (pushState) { history.pushState({ page: idHalaman }, "", ""); }
     
-    // Load surat jika menu Al-Quran dibuka dan masih kosong
     let daftarSuratEl = document.getElementById('daftar-surat');
     if(idHalaman === 'view-quran' && daftarSuratEl && daftarSuratEl.innerHTML.includes('Memuat')) { 
         if(typeof loadDaftarSurat === "function") loadDaftarSurat(); 
@@ -82,7 +80,6 @@ function kembali() {
         if (el) el.value = '';
     });
     
-    // Reset tampilan daftar surah jika habis pencarian
     let searchInputSurah = document.getElementById('searchInputSurah');
     if (searchInputSurah) { filterPencarianSurah(); }
     
@@ -182,16 +179,18 @@ function terapkanPengaturan() {
     if (modeTampilan === 'arab') {
         styleCSS += `
             .teks-latin, .teks-arti { display: none !important; }
+            
+            /* Memaksa kontainer agar menyusun ayat dari kanan ke kiri (RTL) */
             .arab-only-mode #quran-detail-content,
             .arab-only-mode #dzikir-content,
             .arab-only-mode #materi-content {
-                direction: rtl !important; /* <--- INI OBATNYA: Memaksa ayat kembali dari Kanan ke Kiri */
-                text-align: justify !important;
-                text-justify: inter-word !important;
-                text-align-last: right !important;
-                line-height: 2.8 !important; 
-                padding: 0 5px !important;
+                direction: rtl !important;
+                text-align: right !important; 
+                line-height: 2.5 !important; 
+                padding: 10px !important;
             }
+            
+            /* Mengubah setiap blok ayat menjadi Inline layaknya buku Mushaf */
             .arab-only-mode #quran-detail-content > div,
             .arab-only-mode .content-box:not(.centered-arab) {
                 display: inline !important;
@@ -201,17 +200,31 @@ function terapkanPengaturan() {
                 margin: 0 !important;
                 box-shadow: none !important;
             }
+            
+            /* Menyesuaikan teks arab di dalam Mode Mushaf */
             .arab-only-mode .teks-arab:not(.centered-arab .teks-arab) {
                 display: inline !important;
-                margin-left: 15px !important;
+                direction: rtl !important;
+                margin-left: 8px !important;
+                margin-right: 8px !important;
             }
+
+            /* Memperbaiki posisi penanda/nomer ayat agar pas di tengah */
+            .arab-only-mode .ayat-marker {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                vertical-align: middle !important;
+                margin: 0 5px !important;
+            }
+
             .arab-only-mode .centered-arab {
                 display: block !important; 
                 text-align: center !important;
                 border-bottom: 2px dashed #eee !important;
                 padding: 20px 10px !important;
                 margin-bottom: 15px !important;
-                direction: ltr !important; /* Melindungi judul agar tidak ikut ke kanan */
+                direction: ltr !important;
             }
             .arab-only-mode .centered-arab .teks-arab {
                 display: block !important;
@@ -224,22 +237,34 @@ function terapkanPengaturan() {
     }
     dynamicStyle.innerHTML = styleCSS;
 }
+
 // ==========================================
 // 5. LOKASI & JADWAL SHALAT (WAKTU OTOMATIS)
 // ==========================================
 async function deteksiLokasi() {
     if (navigator.geolocation) {
-        document.getElementById('lokasi-teks').innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> MENCARI LOKASI...";
+        let lokasiTeksEl = document.getElementById('lokasi-teks');
+        if (lokasiTeksEl) lokasiTeksEl.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> MENCARI LOKASI...";
+        
         navigator.geolocation.getCurrentPosition(async (position) => {
             try {
                 const lat = position.coords.latitude; const lon = position.coords.longitude;
                 const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
                 const data = await res.json();
                 KOTA = data.address.city || data.address.town || data.address.county || data.address.state || "Jakarta";
-                document.getElementById('lokasi-teks').innerHTML = `<i class='fa-solid fa-location-dot'></i> KOTA ${KOTA.toUpperCase()}`;
+                if (lokasiTeksEl) lokasiTeksEl.innerHTML = `<i class='fa-solid fa-location-dot'></i> KOTA ${KOTA.toUpperCase()}`;
                 ambilJadwalShalat();
-            } catch (e) { document.getElementById('lokasi-teks').innerHTML = `<i class='fa-solid fa-location-dot'></i> KOTA ${KOTA.toUpperCase()}`; }
-        }, () => { document.getElementById('lokasi-teks').innerHTML = `<i class='fa-solid fa-location-dot'></i> KOTA ${KOTA.toUpperCase()}`; });
+            } catch (e) { 
+                if (lokasiTeksEl) lokasiTeksEl.innerHTML = `<i class='fa-solid fa-location-dot'></i> KOTA ${KOTA.toUpperCase()}`; 
+                ambilJadwalShalat();
+            }
+        }, () => { 
+            let lokasiTeksEl = document.getElementById('lokasi-teks');
+            if (lokasiTeksEl) lokasiTeksEl.innerHTML = `<i class='fa-solid fa-location-dot'></i> KOTA ${KOTA.toUpperCase()}`; 
+            ambilJadwalShalat(); // Jika ditolak, tetap panggil waktu default (Jakarta)
+        });
+    } else {
+        ambilJadwalShalat();
     }
 }
 
@@ -435,7 +460,6 @@ function renderUmum(judulTitle, arrayData, viewTargetId = 'view-dzikir', content
     let html = '';
     arrayData.forEach(item => {
         let judulHtml = item.judul ? `<div class='content-title'>${item.judul}</div>` : '';
-        // Cek properti a/arab, l/latin, t/arti yang dipakai di JSON
         let arabHtml = item.arab || item.a ? `<div class='teks-arab'>${item.arab || item.a}</div>` : '';
         let latinHtml = item.latin || item.l ? `<div class='teks-latin'>${item.latin || item.l}</div>` : '';
         let artiHtml = item.arti || item.t ? `<div class='teks-arti'>${item.arti || item.t}</div>` : '';
