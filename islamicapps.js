@@ -35,15 +35,15 @@ window.isFetchingSpecificHadith = false;
 // ==========================================
 // 2. INISIALISASI & TARIK DATA JSON (ANTI-CACHE)
 // ==========================================
-document.addEventListener("DOMContentLoaded", () => {
-    muatDataJSON();
-    
-    // Pasang event listener pencarian
+// GANTI MENJADI SEPERTI INI (Langsung tereksekusi):
+muatDataJSON();
+
+setTimeout(function() {
     let searchHaditsEl = document.getElementById('searchInputHadits');
-    if (searchHaditsEl) {
+    if (searchHaditsEl && typeof window.filterPencarianHadits === 'function') {
         searchHaditsEl.addEventListener('keyup', window.filterPencarianHadits);
     }
-});
+}, 1000);
 
 function muatDataJSON() {
     // GANTI LINK DI BAWAH dengan link raw file data.json Anda di Github
