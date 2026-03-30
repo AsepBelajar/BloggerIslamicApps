@@ -201,7 +201,7 @@ if (modeTampilan === 'arab') {
         .arab-only-mode .content-box .teks-arab {
             display: inline !important;  /* ✅ Inline agar justify bekerja */
             direction: inherit !important;
-            letter-spacing: normal !important;
+            
             word-spacing: normal !important;
         }
         
