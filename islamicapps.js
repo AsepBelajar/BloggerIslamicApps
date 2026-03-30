@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function muatDataJSON() {
     // GANTI LINK DI BAWAH dengan link raw file data.json Anda di Github
-    const linkGithubJSON = "https://raw.githubusercontent.com/AsepBelajar/BloggerIslamicApps/main/databaseaplikasiislam.json";
+    const linkGithubJSON = "https://raw.githubusercontent.com/AsepBelajar/BloggerIslamicApps/main/data.json";
     const urlAntiCache = linkGithubJSON + "?t=" + new Date().getTime();
 
     fetch(urlAntiCache)
@@ -218,3 +218,72 @@ function filterPencarianAyat() {
     }
 }
 
+// ==========================================
+// 6. PENCARIAN HADITS SPESIFIK & LOKAL
+// ==========================================
+window.filterPencarianHadits = async function() {
+    var inputEl = document.getElementById('searchInputHadits');
+    if (!inputEl) return;
+    
+    var inputVal = inputEl.value.toLowerCase().trim();
+    var items = document.querySelectorAll('#hadits-detail-content .hadits-item');
+    var container = document.getElementById('hadits-detail-content');
+    
+    if (inputVal === '') {
+        items.forEach(function(item) { item.style.display = "block"; });
+        var specificBox = document.getElementById('specific-hadith-result');
+        if (specificBox) specificBox.remove();
+        return;
+    }
+
+    if (/^\d+$/.test(inputVal)) {
+        if (window.isFetchingSpecificHadith) return;
+        items.forEach(function(item) { item.style.display = "none"; });
+        
+        var specificBox = document.getElementById('specific-hadith-result');
+        if (!specificBox) {
+            specificBox = document.createElement('div');
+            specificBox.id = 'specific-hadith-result';
+            container.insertBefore(specificBox, container.firstChild);
+        }
+        specificBox.innerHTML = "<div class='loader'></div><center><i>Mencari Hadits Nomor " + inputVal + "...</i></center>";
+        window.isFetchingSpecificHadith = true;
+        
+        try {
+            var namaKitab = window.stateKitabAktif || 'bukhari';
+            var response = await fetch("https://api.hadith.gading.dev/books/" + namaKitab + "/" + inputVal);
+            var result = await response.json();
+            
+            if (result.code === 200 && result.data && result.data.contents) {
+                var h = result.data.contents;
+                specificBox.innerHTML = 
+                    "<div class='content-box hadits-item' style='display:block; border-color:var(--blue-text);'>" +
+                        "<div class='content-title' style='display:flex; justify-content:space-between; direction:ltr; text-align:left;'>" +
+                            "<span>Hadits No. " + h.number + "</span>" +
+                            "<span class='badge' style='background:var(--blue-light); color:var(--blue-card); padding:2px 8px; border-radius:10px; font-size:12px;'>API Search</span>" +
+                        "</div>" +
+                        "<div class='teks-arab' style='direction: rtl; text-align: right; unicode-bidi: isolate;'>" + h.arab + "</div>" +
+                        "<div class='teks-arti'>" + h.id + "</div>" +
+                    "</div>";
+            } else {
+                specificBox.innerHTML = "<center><i>Hadits nomor " + inputVal + " tidak ditemukan.</i></center>";
+            }
+        } catch (error) {
+            specificBox.innerHTML = "<center><i style='color:red;'>Gagal mencari hadits. Server sibuk.</i></center>";
+        } finally {
+            window.isFetchingSpecificHadith = false;
+            terapkanPengaturan();
+        }
+    } else {
+        var specificBox = document.getElementById('specific-hadith-result');
+        if (specificBox) specificBox.remove();
+        
+        items.forEach(function(item) {
+            var text = item.innerText.toLowerCase();
+            item.style.display = text.includes(inputVal) ? "block" : "none";
+        });
+    }
+};
+
+// --- SILAKAN TAMBAHKAN FUNGSI LAINNYA DI BAWAH INI ---
+// (Seperti renderDzikir(), renderMaulid(), dll)
