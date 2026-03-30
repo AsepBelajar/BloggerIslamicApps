@@ -29,7 +29,7 @@ deteksiLokasi(); // Meminta izin lokasi secara otomatis saat web dibuka
 
 function muatDataJSON() {
     // KHUSUS JSON, kita langsung tembak server GitHub asli karena lebih cepat & stabil untuk fetch()
-    const linkGithubJSON = "https://raw.githack.com/AsepBelajar/BloggerIslamicApps/main/databaseaplikasiislam.json";
+    const linkGithubJSON = "https://raw.githack.com/AsepBelajar/BloggerIslamicApps/main/data.json";
     const urlAntiCache = linkGithubJSON + "?t=" + new Date().getTime();
 
     fetch(urlAntiCache)
