@@ -201,7 +201,7 @@ if (modeTampilan === 'arab') {
         .arab-only-mode .content-box .teks-arab {
             display: inline !important;  /* ✅ Inline agar justify bekerja */
             direction: inherit !important;
-            
+            letter-spacing: normal !important;
             word-spacing: normal !important;
         }
         
@@ -237,7 +237,11 @@ if (modeTampilan === 'arab') {
             display: block !important;
             text-align: center !important;
         }        
-        
+        6. PERBAIKAN TAMBAHAN
+           ============================================ */
+        .arab-only-mode .content-box .teks-arab::after {
+            content: " "; /* Tambahkan spasi setiap ayat */
+        }
         
 
         `;
