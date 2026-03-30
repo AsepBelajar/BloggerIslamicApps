@@ -29,7 +29,7 @@ muatDataJSON();
 
 function muatDataJSON() {
     // Menggunakan GitHack agar tidak diblokir oleh browser
-    const linkGithubJSON = "https://raw.githack.com/AsepBelajar/BloggerIslamicApps/main/databaseaplikasiislam.json.json";
+    const linkGithubJSON = "https://raw.githack.com/AsepBelajar/BloggerIslamicApps/main/databaseaplikasiislam.json";
     const urlAntiCache = linkGithubJSON + "?t=" + new Date().getTime();
 
     fetch(urlAntiCache)
