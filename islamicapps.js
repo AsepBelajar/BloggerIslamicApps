@@ -208,29 +208,33 @@ if (modeTampilan === 'arab') {
         /* ============================================
            4. NOMOR AYAT - Posisikan dengan benar
            ============================================ */
+             /* ============================================
+           4. AYAT MARKER - RAHASIA CENTER VERTIKAL
+           ============================================ */
         .arab-only-mode .ayat-marker {
-            display: inline !important;
+            display: inline-block !important; /* Lebih presisi dari inline */
             unicode-bidi: isolate !important;
             direction: rtl !important;
-            margin: 0 5px !important;
-            /* ✅ Posisikan di tengah vertikal */
+            margin: 0 8px !important;
             vertical-align: middle !important;
-            font-size: 0.7em !important; /* Sesuaikan ukuran */
+            line-height: 0 !important; /* ⬅️ RAHASIA UTAMA: Mencegah nomor terseret garis tinggi Arab */
             position: relative !important;
-            top: -0.1em !important; /* Fine-tuning posisi */
+            top: -0.1em !important; /* ⬅️ Fine-tuning: Naikkan sedikit agar tepat di tengah huruf */
         }
-        
+
         /* ============================================
-           5. BISMILLAH - Tetap di tengah
+           5. BISMILLAH - PAKSA BLOCK UNTUK CENTER 100%
            ============================================ */
-        .arab-only-mode #quran-detail-content > .content-box:first-child .teks-arab,
-        .arab-only-mode #quran-detail-content > .teks-arab:first-child {
-            display: block !important;
+        .arab-only-mode #quran-detail-content > .content-box:first-child {
+            display: block !important; /* ⬅️ RAHASIA UTAMA: Keluar dari aliran inline agar bisa 100% lebar */
             text-align: center !important;
             margin-bottom: 25px !important;
             width: 100% !important;
         }
-        
+        .arab-only-mode #quran-detail-content > .content-box:first-child .teks-arab {
+            display: block !important;
+            text-align: center !important;
+        }        
         /* ============================================
            6. PERBAIKAN TAMBAHAN
            ============================================ */
