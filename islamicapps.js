@@ -205,18 +205,18 @@ if (modeTampilan === 'arab') {
             word-spacing: normal !important;
         }
         
-        /* ============================================
-           4. AYAT MARKER - SOLUSI STABIL (Tanpa merusak Justify)
+              /* ============================================
+           4. AYAT MARKER - HAPUS PAKSAAN BIDI (Clean RTL)
            ============================================ */
         .arab-only-mode .ayat-marker {
-            display: inline-block !important; /* WAJIB inline-block, jangan flex */
-            unicode-bidi: isolate !important;
-            direction: rtl !important;
+            display: inline-block !important;
+            /* HAPUS: unicode-bidi: isolate */
+            /* HAPUS: direction: rtl */
             margin: 0 8px !important;
             vertical-align: middle !important;
-            line-height: normal !important; /* ⬅️ RAHASIA: Normal mengembalikan bentuk bulat sempurna */
+            line-height: normal !important; /* Tetap pertahankan agar tidak lonjong */
             position: relative !important;
-            top: -0.15em !important; /* ⬅️ Fine-tuning: Turunkan sedikit agar mati di tengah huruf Arab */
+            top: -0.15em !important;
         }
 
         
