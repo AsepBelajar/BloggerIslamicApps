@@ -46,8 +46,8 @@ setTimeout(function() {
 }, 1000);
 
 function muatDataJSON() {
-    // GANTI LINK DI BAWAH dengan link raw file data.json Anda di Github
-    const linkGithubJSON = "https://raw.githubusercontent.com/AsepBelajar/BloggerIslamicApps/main/data.json";
+    // Gunakan GITHACK agar tidak diblokir browser!
+    const linkGithubJSON = "https://raw.githack.com/AsepBelajar/BloggerIslamicApps/main/databaseaplikasiislam.json";
     const urlAntiCache = linkGithubJSON + "?t=" + new Date().getTime();
 
     fetch(urlAntiCache)
