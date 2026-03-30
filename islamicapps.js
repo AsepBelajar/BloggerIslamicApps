@@ -9,7 +9,7 @@ let modeTampilan = "lengkap"; // "lengkap" atau "arab"
 let isCenteredContent = false; // Untuk Nadhom/Maulid
 let isDarkMode = false; // Dark mode state
 
-// Wadah Penampung Data (Akan diisi otomatis dari JSON)
+// Wadah Penampung Data JSON
 let dataDzikirPagi = [];
 let dataDzikirPetang = [];
 let dataDoaHarian = [];
@@ -22,20 +22,28 @@ let dataYasin = [];
 let dataAsmaulHusna = [];
 
 // ==========================================
-// 2. INISIALISASI OTOMATIS SAAT WEB DIBUKA
+// 2. INISIALISASI & DETEKSI ERROR JSON
 // ==========================================
 muatDataJSON();
-deteksiLokasi(); // Meminta izin lokasi secara otomatis saat web dibuka
+deteksiLokasi(); // Lokasi otomatis
 
 function muatDataJSON() {
-    // KHUSUS JSON, kita langsung tembak server GitHub asli karena lebih cepat & stabil untuk fetch()
     const linkGithubJSON = "https://raw.githack.com/AsepBelajar/BloggerIslamicApps/main/data.json";
     const urlAntiCache = linkGithubJSON + "?t=" + new Date().getTime();
 
     fetch(urlAntiCache)
-        .then(response => {
-            if (!response.ok) throw new Error('Gagal memuat JSON');
-            return response.json();
+        .then(async response => {
+            if (!response.ok) throw new Error('Gagal memuat JSON dari server');
+            const teksJSON = await response.text();
+            try {
+                // Memeriksa apakah format JSON Anda di GitHub sudah benar
+                return JSON.parse(teksJSON);
+            } catch (error) {
+                // JIKA MUNCUL ALERT INI, BERARTI FILE data.json ANDA ADA YANG SALAH KETIK/KOMA
+                alert("⚠️ GAGAL MEMUAT DATA: Terdapat kesalahan format (Syntax Error) pada file data.json Anda di GitHub. Pastikan tidak ada tanda koma (,) atau kutip (\") yang salah tempat.");
+                console.error("Error Detail JSON:", error);
+                throw error;
+            }
         })
         .then(data => {
             if(data.dzikirPagi) dataDzikirPagi = data.dzikirPagi;
@@ -48,9 +56,8 @@ function muatDataJSON() {
             if(data.tahlil) dataTahlil = data.tahlil;
             if(data.yasin) dataYasin = data.yasin;
             if(data.nadhomAsmaulHusna) dataAsmaulHusna = data.nadhomAsmaulHusna;
-            console.log("Semua data JSON berhasil ditarik dari server asli GitHub!");
         })
-        .catch(error => console.error("Error load JSON:", error));
+        .catch(error => console.log("Proses fetch dihentikan."));
 }
 
 // ==========================================
@@ -98,7 +105,7 @@ window.addEventListener('popstate', (event) => {
 });
 
 // ==========================================
-// 4. FUNGSI DARK MODE & PENGATURAN FONT
+// 4. FUNGSI DARK MODE & PENGATURAN FONT (MEMPERBAIKI RTL)
 // ==========================================
 function toggleDarkMode() {
     isDarkMode = !isDarkMode;
@@ -180,19 +187,17 @@ function terapkanPengaturan() {
         styleCSS += `
             .teks-latin, .teks-arti { display: none !important; }
             
-            /* Memaksa kontainer agar menyusun ayat dari kanan ke kiri (RTL) */
-            .arab-only-mode #quran-detail-content,
-            .arab-only-mode #dzikir-content,
-            .arab-only-mode #materi-content {
+            /* 1. Murni Memaksa Wadah Al-Quran Mengalir Dari Kanan (RTL) */
+            .arab-only-mode #quran-detail-content {
                 direction: rtl !important;
-                text-align: right !important; 
-                line-height: 2.5 !important; 
+                text-align: right !important;
+                line-height: 2.8 !important;
+                display: block !important;
                 padding: 10px !important;
             }
             
-            /* Mengubah setiap blok ayat menjadi Inline layaknya buku Mushaf */
-            .arab-only-mode #quran-detail-content > div,
-            .arab-only-mode .content-box:not(.centered-arab) {
+            /* 2. Menyatukan Setiap Ayat Seolah Sebaris (Inline) */
+            .arab-only-mode #quran-detail-content .content-box {
                 display: inline !important;
                 border: none !important;
                 background: transparent !important;
@@ -201,37 +206,29 @@ function terapkanPengaturan() {
                 box-shadow: none !important;
             }
             
-            /* Menyesuaikan teks arab di dalam Mode Mushaf */
-            .arab-only-mode .teks-arab:not(.centered-arab .teks-arab) {
+            /* 3. Menjaga Teks Arab Patuh pada RTL */
+            .arab-only-mode #quran-detail-content .content-box .teks-arab {
                 display: inline !important;
                 direction: rtl !important;
-                margin-left: 8px !important;
-                margin-right: 8px !important;
+                margin: 0 !important;
             }
-
-            /* Memperbaiki posisi penanda/nomer ayat agar pas di tengah */
+            
+            /* 4. Menengahkan Nomer Ayat */
             .arab-only-mode .ayat-marker {
                 display: inline-flex !important;
                 align-items: center !important;
                 justify-content: center !important;
                 vertical-align: middle !important;
-                margin: 0 5px !important;
+                margin: 0 10px !important;
+                direction: ltr !important; /* Angkanya LTR, Letaknya RTL */
             }
 
-            .arab-only-mode .centered-arab {
-                display: block !important; 
-                text-align: center !important;
-                border-bottom: 2px dashed #eee !important;
-                padding: 20px 10px !important;
-                margin-bottom: 15px !important;
-                direction: ltr !important;
-            }
-            .arab-only-mode .centered-arab .teks-arab {
+            /* 5. Mengamankan Bismillah di Paling Atas dan Tengah */
+            .arab-only-mode #quran-detail-content > .teks-arab:first-child {
                 display: block !important;
                 text-align: center !important;
-                margin-bottom: 10px !important;
-                margin-left: 0 !important; 
-                direction: rtl !important;
+                margin-bottom: 25px !important;
+                width: 100% !important;
             }
         `;
     }
@@ -261,7 +258,7 @@ async function deteksiLokasi() {
         }, () => { 
             let lokasiTeksEl = document.getElementById('lokasi-teks');
             if (lokasiTeksEl) lokasiTeksEl.innerHTML = `<i class='fa-solid fa-location-dot'></i> KOTA ${KOTA.toUpperCase()}`; 
-            ambilJadwalShalat(); // Jika ditolak, tetap panggil waktu default (Jakarta)
+            ambilJadwalShalat(); // Jika ditolak, panggil waktu default
         });
     } else {
         ambilJadwalShalat();
@@ -453,7 +450,7 @@ function renderUmum(judulTitle, arrayData, viewTargetId = 'view-dzikir', content
     if(!contentEl) return;
     
     if(!arrayData || arrayData.length === 0) {
-        contentEl.innerHTML = "<center><br/><i>Sistem sedang memuat data dari server, silakan kembali lalu buka ulang menu ini...</i></center>";
+        contentEl.innerHTML = "<center><br/><i>Sistem sedang memuat data dari server, silakan kembali lalu buka ulang menu ini... (Jika tulisan ini tidak hilang, periksa format file data.json Anda di GitHub)</i></center>";
         return;
     }
 
