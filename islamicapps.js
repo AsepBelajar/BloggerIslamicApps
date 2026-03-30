@@ -22,6 +22,7 @@ let dataBacaanShalat = [];
 let dataMaulidDetail = [];
 let dataTahlil = [];
 let dataYasin = [];
+let dataAsmaulHusna = [];
 // (Tambahkan wadah lain di sini jika ada)
 
 // Variabel State Aplikasi
@@ -63,6 +64,7 @@ function muatDataJSON() {
             if(data.maulidDetail) dataMaulidDetail = data.maulidDetail;
             if(data.tahlil) dataTahlil = data.tahlil;
             if(data.yasin) dataYasin = data.yasin;
+           if(data.nadhomAsmaulHusna) dataAsmaulHusna = data.nadhomAsmaulHusna;
             console.log("Semua data berhasil ditarik dari JSON");
         })
         .catch(error => console.error("Error load JSON:", error));
