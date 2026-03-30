@@ -138,90 +138,81 @@ function setModeTampilan(mode) {
     terapkanPengaturan();
 }
 
-   function terapkanPengaturan() {
-        // Atur body class untuk mode arab saja
-        if (modeTampilan === 'arab') {
-            document.body.classList.add('arab-only-mode');
-        } else {
-            document.body.classList.remove('arab-only-mode');
-        }
+ function terapkanPengaturan() {
+    if (modeTampilan === 'arab') {
+        document.body.classList.add('arab-only-mode');
+    } else {
+        document.body.classList.remove('arab-only-mode');
+    }
 
-        // Gunakan elemen <style> dinamis agar perubahan berlaku mutlak
-        let dynamicStyle = document.getElementById('dynamic-settings-style');
-        if (!dynamicStyle) {
-            dynamicStyle = document.createElement('style');
-            dynamicStyle.id = 'dynamic-settings-style';
-            document.head.appendChild(dynamicStyle);
-        }
-        
-        // CSS Dasar (Berlaku di semua mode)
-        let styleCSS = `
-            .teks-arab { font-size: ${ukuranArab}px !important; }
-            .teks-latin, .teks-arti { font-size: ${ukuranLatin}px !important; }
+    let dynamicStyle = document.getElementById('dynamic-settings-style');
+    if (!dynamicStyle) {
+        dynamicStyle = document.createElement('style');
+        dynamicStyle.id = 'dynamic-settings-style';
+        document.head.appendChild(dynamicStyle);
+    }
+    
+    let styleCSS = `
+        .teks-arab { font-size: ${ukuranArab}px !important; }
+        .teks-latin, .teks-arti { font-size: ${ukuranLatin}px !important; }
+        .content-title { direction: ltr !important; text-align: left !important; display: block !important; }
+    `;
+    
+    if (modeTampilan === 'arab') {
+        styleCSS += `
+            /* Sembunyikan terjemahan dan latin */
+            .teks-latin, .teks-arti { display: none !important; }
             
-            /* PERBAIKAN PERMANEN: Judul konten (Hadits, Doa, Al-Qur'an, dll) WAJIB Rata Kiri (LTR) */
-            .content-title { 
-                direction: ltr !important; 
-                text-align: left !important; 
+            /* 1. WADAH MUSHAF: Rata Kanan Murni (Solusi agar Waqaf tidak menumpuk) */
+            .arab-only-mode #quran-detail-content,
+            .arab-only-mode #dzikir-content,
+            .arab-only-mode #materi-content {
+                direction: rtl !important;
+                text-align: right !important; /* Jangan gunakan justify di sini */
                 display: block !important;
+                line-height: 2.5 !important;
+                padding: 15px !important;
+            }
+            
+            /* 2. Jadikan box per-ayat menyatu seperti paragraf buku */
+            .arab-only-mode .content-box {
+                display: inline !important;
+                border: none !important;
+                background: transparent !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+            }
+            
+            /* 3. Teks Arab mengalir natural, tanpa tarikan spasi paksa */
+            .arab-only-mode .content-box .teks-arab {
+                display: inline !important;
+                direction: rtl !important;
+                letter-spacing: normal !important;
+                word-spacing: normal !important;
+            }
+            
+            /* 4. Penanda Nomor Ayat (Diisolasi agar angka tidak membalik teks) */
+            .arab-only-mode .ayat-marker {
+                display: inline-block !important; 
+                unicode-bidi: isolate !important; 
+                direction: rtl !important;
+                margin: 0 8px !important;
+            }
+
+            /* 5. Khusus Bismillah di awal surat agar tetap manis di tengah */
+            .arab-only-mode #quran-detail-content > .content-box:first-child .teks-arab,
+            .arab-only-mode #quran-detail-content > .teks-arab:first-child {
+                display: block !important;
+                text-align: center !important;
+                margin-bottom: 25px !important;
+                width: 100% !important;
             }
         `;
-        
-        // Aturan Khusus saat "Mode Arab Saja" aktif
-        if (modeTampilan === 'arab') {
-            styleCSS += `
-                /* 1. Sembunyikan teks latin dan arti */
-                .teks-latin, .teks-arti { display: none !important; }
-                
-                /* 2. Format Teks Tersambung & Rata Kanan (Justify) untuk Semua Konten TERMASUK HADITS */
-                .arab-only-mode #quran-detail-content,
-                .arab-only-mode #dzikir-content,
-                .arab-only-mode #materi-content,
-                .arab-only-mode #hadits-detail-content {
-                    text-align: justify !important;
-                    text-justify: inter-word !important;
-                    text-align-last: right !important; /* Memaksa baris paling bawah rata kanan */
-                    line-height: 2.8 !important; 
-                    padding: 0 5px !important;
-                }
-
-                /* Hilangkan box/margin pembungkus agar teks bisa mengalir (tersambung) */
-                .arab-only-mode #quran-detail-content > div,
-                .arab-only-mode #hadits-detail-content > div,
-                .arab-only-mode .content-box:not(.centered-arab) {
-                    display: inline !important;
-                    border: none !important;
-                    background: transparent !important;
-                    padding: 0 !important;
-                    margin: 0 !important;
-                    box-shadow: none !important;
-                }
-
-                .arab-only-mode .teks-arab:not(.centered-arab .teks-arab) {
-                    display: inline !important;
-                    margin-left: 15px !important; /* Jarak spasi antar ayat/hadits */
-                }
-
-                /* 3. Kembalikan Format Rata Tengah & Per Baris untuk Nadzhom/Maulid */
-                .arab-only-mode .centered-arab {
-                    display: block !important; 
-                    text-align: center !important;
-                    border-bottom: 2px dashed #eee !important;
-                    padding: 20px 10px !important;
-                    margin-bottom: 15px !important;
-                }
-
-                .arab-only-mode .centered-arab .teks-arab {
-                    display: block !important;
-                    text-align: center !important;
-                    margin-bottom: 10px !important;
-                    margin-left: 0 !important; 
-                }
-            `;
-        }
-        
-        dynamicStyle.innerHTML = styleCSS;
     }
+    dynamicStyle.innerHTML = styleCSS;
+}
+
 
 // ==========================================
 // 5. JADWAL SHALAT (WAKTU OTOMATIS)
