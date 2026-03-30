@@ -164,19 +164,21 @@ function terapkanPengaturan() {
             /* Sembunyikan terjemahan dan latin */
             .teks-latin, .teks-arti { display: none !important; }
             
-            /* 1. Pengaturan Utama Wadah Al-Qur'an agar Justify (Rata Kiri-Kanan) */
-            .arab-only-mode #quran-detail-content {
+            /* 1. KUNCI UTAMA RTL & JUSTIFY: Memaksa wadah membaca dari Kanan ke Kiri mutlak */
+            .arab-only-mode #quran-detail-content,
+            .arab-only-mode #dzikir-content,
+            .arab-only-mode #materi-content {
                 direction: rtl !important;
                 text-align: justify !important;
-                text-justify: inter-word !important;
-                text-align-last: right !important; /* Baris terakhir berhenti di kanan */
+                text-justify: inter-word !important; /* Merenggangkan spasi antar kata */
+                text-align-last: right !important; /* Baris paling bawah tetap merapat ke Kanan */
+                display: block !important;
                 line-height: 2.5 !important;
                 padding: 15px !important;
-                display: block !important;
             }
             
-            /* 2. Jadikan box per-ayat menjadi teks bersambung (Inline) */
-            .arab-only-mode #quran-detail-content .content-box {
+            /* 2. Mengubah box per-ayat menjadi teks bersambung (Inline) murni */
+            .arab-only-mode .content-box {
                 display: inline !important;
                 border: none !important;
                 background: transparent !important;
@@ -185,21 +187,22 @@ function terapkanPengaturan() {
                 box-shadow: none !important;
             }
             
-            /* 3. Teks arab juga bersambung, tanpa pembatas antar ayat */
-            .arab-only-mode #quran-detail-content .content-box .teks-arab {
+            /* 3. Teks arab dikunci RTL agar tidak ditarik LTR oleh angka */
+            .arab-only-mode .content-box .teks-arab {
                 display: inline !important;
                 direction: rtl !important;
+                unicode-bidi: isolate !important; /* Mencegah teks terbalik */
             }
             
-            /* 4. Nomor ayat menggunakan inline-block agar Justify TIDAK RUSAK */
+            /* 4. OBAT PENYAKIT LTR: Penanda Ayat harus diisolasi sifat angkanya */
             .arab-only-mode .ayat-marker {
                 display: inline-block !important; 
-                text-align: center !important;
+                unicode-bidi: isolate !important; /* Mengurung sifat LTR angka */
+                direction: rtl !important;
                 margin: 0 8px !important;
-                direction: ltr !important; 
             }
 
-            /* 5. Bismillah di awal surat wajib ke tengah (Center) */
+            /* 5. Bismillah di awal surat (elemen pertama) kembali ke tengah */
             .arab-only-mode #quran-detail-content > .teks-arab:first-child {
                 display: block !important;
                 text-align: center !important;
@@ -211,7 +214,6 @@ function terapkanPengaturan() {
     }
     dynamicStyle.innerHTML = styleCSS;
 }
-
 
 // ==========================================
 // 5. JADWAL SHALAT (WAKTU OTOMATIS)
