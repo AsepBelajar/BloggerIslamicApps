@@ -138,9 +138,13 @@ function setModeTampilan(mode) {
     terapkanPengaturan();
 }
 
+
 function terapkanPengaturan() {
-    if (modeTampilan === 'arab') document.body.classList.add('arab-only-mode');
-    else document.body.classList.remove('arab-only-mode');
+    if (modeTampilan === 'arab') {
+        document.body.classList.add('arab-only-mode');
+    } else {
+        document.body.classList.remove('arab-only-mode');
+    }
 
     let dynamicStyle = document.getElementById('dynamic-settings-style');
     if (!dynamicStyle) {
@@ -157,23 +161,22 @@ function terapkanPengaturan() {
     
     if (modeTampilan === 'arab') {
         styleCSS += `
+            /* Sembunyikan terjemahan dan latin */
             .teks-latin, .teks-arti { display: none !important; }
             
-            /* Memperbaiki Rata Kiri-Kanan (Justify) pada Mode Arab */
-            .arab-only-mode #quran-detail-content,
-            .arab-only-mode #dzikir-content,
-            .arab-only-mode #materi-content {
+            /* 1. Pengaturan Utama Wadah Al-Qur'an agar Justify (Rata Kiri-Kanan) */
+            .arab-only-mode #quran-detail-content {
                 direction: rtl !important;
                 text-align: justify !important;
                 text-justify: inter-word !important;
-                text-align-last: right !important; /* Baris terakhir tetap di kanan */
-                line-height: 2.8 !important;
+                text-align-last: right !important; /* Baris terakhir berhenti di kanan */
+                line-height: 2.5 !important;
+                padding: 15px !important;
                 display: block !important;
-                padding: 10px !important;
             }
             
-            .arab-only-mode #quran-detail-content .content-box,
-            .arab-only-mode #dzikir-content .content-box:not(.centered-arab) {
+            /* 2. Jadikan box per-ayat menjadi teks bersambung (Inline) */
+            .arab-only-mode #quran-detail-content .content-box {
                 display: inline !important;
                 border: none !important;
                 background: transparent !important;
@@ -182,21 +185,21 @@ function terapkanPengaturan() {
                 box-shadow: none !important;
             }
             
-            .arab-only-mode .teks-arab:not(.centered-arab .teks-arab) {
+            /* 3. Teks arab juga bersambung, tanpa pembatas antar ayat */
+            .arab-only-mode #quran-detail-content .content-box .teks-arab {
                 display: inline !important;
                 direction: rtl !important;
-                margin: 0 !important;
             }
             
+            /* 4. Nomor ayat menggunakan inline-block agar Justify TIDAK RUSAK */
             .arab-only-mode .ayat-marker {
-                display: inline-flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                vertical-align: middle !important;
-                margin: 0 10px !important;
+                display: inline-block !important; 
+                text-align: center !important;
+                margin: 0 8px !important;
                 direction: ltr !important; 
             }
 
+            /* 5. Bismillah di awal surat wajib ke tengah (Center) */
             .arab-only-mode #quran-detail-content > .teks-arab:first-child {
                 display: block !important;
                 text-align: center !important;
@@ -208,6 +211,7 @@ function terapkanPengaturan() {
     }
     dynamicStyle.innerHTML = styleCSS;
 }
+
 
 // ==========================================
 // 5. JADWAL SHALAT (WAKTU OTOMATIS)
