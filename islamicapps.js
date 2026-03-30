@@ -168,7 +168,7 @@ function setModeTampilan(mode) {
             .arab-only-mode #dzikir-content,
             .arab-only-mode #materi-content {
                 direction: rtl !important;
-                text-align: right !important; /* Jangan gunakan justify di sini */
+                text-align: justify !important; /* Jangan gunakan justify di sini */
                 display: block !important;
                 line-height: 2.5 !important;
                 padding: 15px !important;
