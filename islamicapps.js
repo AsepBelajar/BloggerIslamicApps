@@ -233,11 +233,7 @@ if (modeTampilan === 'arab') {
             display: block !important;
             text-align: center !important;
         }        
-        6. PERBAIKAN TAMBAHAN
-           ============================================ */
-        .arab-only-mode .content-box .teks-arab::after {
-            content: " "; /* Tambahkan spasi setiap ayat */
-        }
+        
         
 
         `;
