@@ -159,91 +159,166 @@ function terapkanPengaturan() {
         .content-title { direction: ltr !important; text-align: left !important; display: block !important; }
     `;
     
-    if (modeTampilan === 'arab') {
-        styleCSS += `
-            /* Sembunyikan terjemahan dan latin */
-            .teks-latin, .teks-arti { display: none !important; }
-            
-            /* ============================================
-               1. PARENT CONTAINER - Satu kali RTL di sini saja
-               ============================================ */
-            .arab-only-mode #quran-detail-content,
-            .arab-only-mode #dzikir-content,
-            .arab-only-mode #materi-content {
-                direction: rtl !important;
-                text-align: justify !important;
-                text-align-last: right !important;
-                display: block !important;
-                line-height: 2.5 !important;
-                padding: 15px !important;
-                /* HAPUS whitespace antar child elements */
-                font-size: 0 !important; /* Trik hapus spasi inline */
-            }
-            
-            /* ============================================
-               2. CONTENT-BOX - Gunakan inline-block BUKAN inline
-               ============================================ */
-            .arab-only-mode .content-box {
-                display: inline-block !important;  /* ✅ inline-block, bukan inline */
-                border: none !important;
-                background: transparent !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                box-shadow: none !important;
-                vertical-align: top !important;    /* ✅ Prevent baseline shift */
-                /* Kembalikan font-size dari parent yang di-set 0 */
-                font-size: ${ukuranArab}px !important;
-            }
-            
-            /* ============================================
-               3. TEKS ARAB - JANGAN set direction lagi!
-               ============================================ */
-            .arab-only-mode .content-box .teks-arab {
-                display: block !important;  /* ✅ block untuk justify bekerja */
-                direction: inherit !important;  /* ✅ Warisi dari parent, JANGAN set rtl lagi */
-                letter-spacing: normal !important;
-                word-spacing: normal !important;
-                text-align: justify !important;
-                text-align-last: right !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            
-            /* ============================================
-               4. AYAT MARKER - Isolate dengan benar
-               ============================================ */
-            .arab-only-mode .ayat-marker {
-                display: inline-block !important;
-                unicode-bidi: isolate !important;
-                direction: rtl !important;
-                margin: 0 5px !important;
-                vertical-align: middle !important;
-            }
+if (modeTampilan === 'arab') {
+    styleCSS += `
+        /* Sembunyikan terjemahan dan latin */
+        .teks-latin, .teks-arti { display: none !important; }
+        
+        /* ============================================
+           1. KONTAINER UTAMA - Tetap RTL dan Justify
+           ============================================ */
+        .arab-only-mode #quran-detail-content,
+        .arab-only-mode #dzikir-content,
+        .arab-only-mode #materi-content {
+            direction: rtl !important;
+            text-align: justify !important;
+            text-align-last: right !important;
+            line-height: 2.5 !important;
+            padding: 15px !important;
+            /* HAPUS whitespace antar child elements */
+            font-size: 0 !important;
+            word-spacing: -0.5em !important; /* Trik tambahan */
+        }
+        
+        /* ============================================
+           2. CONTENT-BOX - Ubah ke INLINE (bukan inline-block)
+           ============================================ */
+        .arab-only-mode .content-box {
+            display: inline !important;  /* ✅ Perubahan kunci */
+            border: none !important;
+            background: transparent !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            /* Kembalikan font-size */
+            font-size: ${ukuranArab}px !important;
+            word-spacing: normal !important;
+        }
+        
+        /* ============================================
+           3. TEKS ARAB - Ubah ke INLINE
+           ============================================ */
+        .arab-only-mode .content-box .teks-arab {
+            display: inline !important;  /* ✅ Inline agar justify bekerja */
+            direction: inherit !important;
+            letter-spacing: normal !important;
+            word-spacing: normal !important;
+        }
+        
+        /* ============================================
+           4. NOMOR AYAT - Posisikan dengan benar
+           ============================================ */
+        .arab-only-mode .ayat-marker {
+            display: inline !important;
+            unicode-bidi: isolate !important;
+            direction: rtl !important;
+            margin: 0 5px !important;
+            /* ✅ Posisikan di tengah vertikal */
+            vertical-align: middle !important;
+            font-size: 0.7em !important; /* Sesuaikan ukuran */
+            position: relative !important;
+            top: -0.1em !important; /* Fine-tuning posisi */
+        }
+        
+        /* ============================================
+           5. BISMILLAH - Tetap di tengah
+           ============================================ */
+        .arab-only-mode #quran-detail-content > .content-box:first-child .teks-arab,
+        .arab-only-mode #quran-detail-content > .teks-arab:first-child {
+            display: block !important;
+            text-align: center !important;
+            margin-bottom: 25px !important;
+            width: 100% !important;
+        }
+        
+        /* ============================================
+           6. PERBAIKAN TAMBAHAN
+           ============================================ */
+        .arab-only-mode .content-box .teks-arab::after {
+            content: " "; /* Tambahkan spasi setiap ayat */
+        }
 
-            /* ============================================
-               5. BISMILLAH - Tetap di tengah
-               ============================================ */
-            .arab-only-mode #quran-detail-content > .content-box:first-child .teks-arab,
-            .arab-only-mode #quran-detail-content > .teks-arab:first-child {
-                display: block !important;
-                text-align: center !important;
-                margin-bottom: 25px !important;
-                width: 100% !important;
-            }
-
-            /* ============================================
-               6. BONUS: Perbaikan untuk kontainer terlalu sempit
-               ============================================ */
-            .arab-only-mode #quran-detail-content {
-                max-width: 100% !important;
-                overflow-wrap: break-word !important;
-                word-break: normal !important;
-            }
         `;
     }
     dynamicStyle.innerHTML = styleCSS;
 }
 
+function gabungkanTeksArab() {
+    if (modeTampilan !== 'arab') return;
+    
+    const kontainer = document.querySelector('#quran-detail-content') || 
+                      document.querySelector('#dzikir-content') || 
+                      document.querySelector('#materi-content');
+    
+    if (!kontainer) return;
+    
+    const contentBoxes = kontainer.querySelectorAll('.content-box');
+    if (contentBoxes.length === 0) return;
+    
+    // Buat wadah baru untuk teks yang digabung
+    const teksGabung = document.createElement('div');
+    teksGabung.className = 'arab-merged-text';
+    teksGabung.style.cssText = `
+        direction: rtl;
+        text-align: justify;
+        text-align-last: right;
+        line-height: 2.5;
+        font-size: ${ukuranArab}px;
+    `;
+    
+    // Salin konten dari setiap content-box
+    contentBoxes.forEach((box, index) => {
+        const teksArab = box.querySelector('.teks-arab');
+        const ayatMarker = box.querySelector('.ayat-marker');
+        
+        if (teksArab) {
+            // Tambahkan teks Arab
+            const spanTeks = document.createElement('span');
+            spanTeks.className = 'teks-arab';
+            spanTeks.textContent = teksArab.textContent + ' ';
+            teksGabung.appendChild(spanTeks);
+            
+            // Tambahkan nomor ayat jika ada
+            if (ayatMarker) {
+                const spanMarker = document.createElement('span');
+                spanMarker.className = 'ayat-marker';
+                spanMarker.textContent = ayatMarker.textContent;
+                spanMarker.style.cssText = `
+                    display: inline-block;
+                    unicode-bidi: isolate;
+                    direction: rtl;
+                    margin: 0 5px;
+                    vertical-align: middle;
+                    font-size: 0.7em;
+                    position: relative;
+                    top: -0.1em;
+                `;
+                teksGabung.appendChild(spanMarker);
+                teksGabung.appendChild(document.createTextNode(' '));
+            }
+        }
+    });
+    
+    // Sembunyikan content-box asli dan tampilkan teks gabungan
+    contentBoxes.forEach(box => box.style.display = 'none');
+    
+    // Pastikan tidak duplikat
+    const existingMerged = kontainer.querySelector('.arab-merged-text');
+    if (existingMerged) existingMerged.remove();
+    
+    kontainer.insertBefore(teksGabung, kontainer.firstChild);
+}
+
+function renderUmum(judulTitle, arrayData, viewTargetId = 'view-dzikir', contentId = 'dzikir-content', titleId = 'dzikir-title') {
+    // ... kode existing ...
+    
+    terapkanPengaturan();
+    
+    // ✅ Panggil fungsi penggabungan teks
+    setTimeout(() => {
+        gabungkanTeksArab();
+    }, 100); // Delay sedikit untuk memastikan CSS diterapkan
+}
 
 // ==========================================
 // 5. JADWAL SHALAT (WAKTU OTOMATIS)
